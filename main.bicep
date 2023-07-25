@@ -7,6 +7,9 @@ param location string = resourceGroup().location
 @description('Request Units Per Second')
 param cosmosDbDataThroughput int = 400
 
+@description('Name of the Storage Account')
+param storageAccountName string = 'moonshardstg'
+
 @description('Container Name')
 var cosmosDBContainerName = 'FlightTests'
 
@@ -22,9 +25,7 @@ var logAnalyticsWorkspaceName = 'MoonLogs'
 @description('Name of the diagnostic settings')
 var cosmosDbAccountDiagnosticSettingsName = 'Send-logs-to-log-analytics'
 
-@description('Name of the Storage Account')
-var storageAccountName = 'moonshardstg'
-
+@description('Diagnostic Setting Name')
 var storageAccountBlobDiagnosticSettingsName = 'Send-logs-to-log-analytics'
 
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
