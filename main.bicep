@@ -16,6 +16,11 @@ var cosmosDBContainerPartitionKey = '/droneId'
 @description('Database Name')
 var cosmosDatabaseName = 'FlightTest'
 
+@description('Name of the Law')
+var logAnalyticsWorkspaceName = 'MoonLogs'
+
+@description('Name of the diagnostic settings')
+var cosmosDbAccountDiagnosticSettingsName = 'Send-logs-to-log-analytics'
 
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   name: cosmosDbAccountName
@@ -60,5 +65,23 @@ resource containers 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containe
       }
     }
     options: {}
+  }
+}
+
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
+  name: logAnalyticsWorkspaceName
+}
+
+resource cosmosDbAccountDiagnostics'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  scope: cosmosDbAccount
+  name:cosmosDbAccountDiagnosticSettingsName
+  properties: {
+    workspaceId: logAnalyticsWorkspace.id
+    logs: [
+      {
+        category: 'DataPlaneRequests'
+        enabled: true
+      }
+    ]
   }
 }
