@@ -22,6 +22,11 @@ var logAnalyticsWorkspaceName = 'MoonLogs'
 @description('Name of the diagnostic settings')
 var cosmosDbAccountDiagnosticSettingsName = 'Send-logs-to-log-analytics'
 
+@description('Name of the Storage Account')
+var storageAccountName = 'moonshardstg'
+
+var storageAccountBlobDiagnosticSettingsName = 'Send-logs-to-log-analytics'
+
 resource cosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2023-04-15' = {
   name: cosmosDbAccountName
   location: location
@@ -83,5 +88,35 @@ resource cosmosDbAccountDiagnostics'Microsoft.Insights/diagnosticSettings@2021-0
         enabled: true
       }
     ]
+  }
+}
+
+resource storageaccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+  name: storageAccountName
+
+  resource blobService 'blobServices' existing = {
+    name: 'default'
+  }
+}
+
+resource storageAccountBlobDiagnostics'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  scope: storageaccount::blobService
+  name: storageAccountBlobDiagnosticSettingsName
+  properties: {
+     workspaceId: logAnalyticsWorkspace.id
+     logs: [
+      {
+        category: 'StorageRead'
+        enabled: true
+      }
+      {
+        category: 'StorageWrite'
+        enabled: true
+      }
+      {
+        category: 'StorageDelete'
+        enabled: true
+      }
+     ]
   }
 }
